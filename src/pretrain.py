@@ -33,7 +33,7 @@ from transformers.utils.versions import require_version
 
 from sklearn.metrics import accuracy_score
 from transformers.trainer_utils import PREFIX_CHECKPOINT_DIR
-from model import Transformer, ModelArgs
+from models.llama2.llama_model import Transformer, ModelArgs
 
 
 

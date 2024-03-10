@@ -4,7 +4,7 @@ import numpy as np
 from torch.utils.data import Dataset,DataLoader
 import torch
 from sklearn.model_selection import train_test_split
-from chatglm_tokenizer.tokenization_chatglm import ChatGLMTokenizer
+from tokenizer.chatglm_tokenizer.tokenization_chatglm import ChatGLMTokenizer
 class SFTDataset(Dataset):
     def __init__(self,df,tokenizer
                  ,max_length=256
