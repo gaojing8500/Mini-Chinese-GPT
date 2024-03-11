@@ -1,7 +1,7 @@
 export CUDA_VISIBLE_DEVICES=0,1,2,3,4,5,6,7
 lr=3e-4
 
-config_name=./model_config.json
+config_name=./models/llama2/model_config.json
 dataset_dir=/data/datasets/pretrained/process_datasets
 
 per_device_train_batch_size=16

@@ -1,7 +1,7 @@
 
 lr=3e-4
 
-config_name=./model_config.json
+config_name=./models/llama2/model_config.json
 dataset_dir=./dataset
 
 per_device_train_batch_size=16

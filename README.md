@@ -15,12 +15,10 @@ Recreate a mini GPT model from 0 to 1, 能够在医学领域具备较强的领�
    | C4_zh：[百度网盘 part1](https://pan.baidu.com/s/18O2Tj_PPB718K8gnaWrWUQ) 提取码：zv4r；[百度网盘 part2](https://pan.baidu.com/s/11PTgtUfFXvpNkOige9Iw4w) 提取码：sb83；[百度网盘 part3](https://pan.baidu.com/s/1248QfTS8QHPojYW-0fd5jQ) 提取码：l89d | C4是可用的最大语言数据集之一，收集了来自互联网上超过3.65亿个域的超过1560亿个token。C4_zh是其中的一部分 |
    | WuDaoCorpora：[智源研究院BAAI：WuDaoCorpora Text文本预训练数据集](https://data.baai.ac.cn/details/WuDaoCorporaText)                                                                                                                       | 中文悟道开源的200G数据                                                 |
    | shibing624/medical：[shibing624/medical](https://huggingface.co/datasets/shibing624/medical/tree/main)                                                                                                          | 源自shibing624的一部分医学领域的预训练数据                                    |
+   | MNBVC [MNBVC ](https://huggingface.co/datasets/liwu/MNBVC/tree/main)         | MNBVC数据集不但包括主流文化，也包括各个小众文化甚至火星文的数据。MNBVC数据集包括新闻、作文、小说、书籍、杂志、论文、台词、帖子、wiki、古诗、歌词、商品介绍、笑话、糗事、聊天记录等一切形式的纯文本中文数据。数据均来源于互联网收集。|
 
-同时，为了给大家节省数据预处理的时间，本项目开源了经过ChatGLM2-6B的分词器处理后的预训练语料，共计**634亿Tokens**的数据量，链接如下：[Baby-llama2-chinese Corpus](https://pan.baidu.com/s/18o4gF-G68qfgOGWQXgAg3g) 提取码：6unr。将下载好的数据放到./data目录下即可。
-
-【考虑到作者所持有机子的局限性（4张3090），目前634亿Tokens的预训练语料+300M参数量的模型已经是本人预训练的极限-注：没有使用DeepSpeed、Megatron等分布式训练架构】
 ### 预训练语料预处理
-数据预处理采取GPT的通用做法，对语料进行提前分词，对一个样本做完分词后在末尾加上一个结束符号`<eos>`，与下一个样本区分开。然后将所有的训练语料拼接成一个数组（np.uint16）以.bin二进制格式存储到磁盘上。如果语料过大，避免内存溢出，可以选择mmap格式。
+数据预处理采取GPT的通用做法，对语料进行提前分词，对一个样本做完分词后在末尾加上一个结束符号`<eos>`（如果是采用开源模型架构，需要根据具体的模型结束符号比如qwen采用`<|im_end|>`），与下一个样本区分开。然后将所有的训练语料拼接成一个数组（np.uint16）以.bin二进制格式存储到磁盘上。如果语料过大，避免内存溢出，可以选择mmap格式。
 ```bash
 #脚本里面每一个函数对应一个语料库的预处理，搭建新加语料可以自行扩展。
 python data_process.py
@@ -31,9 +29,8 @@ python data_process.py
 #考虑到预训练的运行时间非常久，需要采用程序后台运行的措施，本项目提供一种常用的程序后台运行的操作：
 screen -S ambrose    #(创建新的名称为ambrose的screen)
 screen -r ambrose    #(进入名称为ambrose的screen)
-#在该screen下执行预训练代码，如果你有四张卡，则nproc_per_node设置为4
-torchrun --standalone --nproc_per_node=4 pretrain.py
-#运行结束后，预训练模型会保存在‘out/pretrain’文件夹中
+#如需更新配置文件，请在对应prtrain.sh文件中进行修改
+sh script/pretrain.sh
 ```
    
 ## 💡SFT指令微调
@@ -60,6 +57,8 @@ LLM微调的目的是将预训练模型中的知识引导出来的一种手段�
    |-----------------------------------------------------------------------------|---------------------------------------------------------------------|
    | alpaca-zh：[alpaca-zh](https://huggingface.co/datasets/shibing624/alpaca-zh) | 源自shibing624的一部分SFT数据。该数据集是参考Alpaca方法基于GPT4得到的self-instruct数据，约5万条。 |
    | bell：[bell](https://huggingface.co/datasets/BelleGroup/train_1M_CN)         | 源自BelleGroup的一部分SFT数据。包含约100万条由BELLE项目生成的中文指令数据。|
+   | huatuo：[
+Huatuo26M-Lite](https://huggingface.co/datasets/FreedomIntelligence/Huatuo26M-Lite/viewer)         | Huatuo-26M 是目前为止最大的中文医疗问答数据集。此数据集包含了超过2600万个高质量的医疗问答对，涵盖了各种疾病、症状、治疗方式、药品信息等多个方面|
 
    **医学垂直领域SFT数据**：
          
@@ -87,7 +86,5 @@ python sft_data_process.py
 #微调所需时间一般较短，如需要后台运行，本项目提供一种常用的程序后台运行的操作：
 screen -S ambrose    #(创建新的名称为ambrose的screen)
 screen -r ambrose    #(进入名称为ambrose的screen)
-#在该screen下执行微调代码
-python sft.py
-#运行结束后，SFT模型会保存在‘out/sft’文件夹中
+python script/sft.py
 ```

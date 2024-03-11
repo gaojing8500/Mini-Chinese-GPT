@@ -331,7 +331,7 @@ def main():
          
     df=df.sample(frac=1.0)
     print(df)
-    tokenizer=ChatGLMTokenizer(vocab_file='./chatglm_tokenizer/tokenizer.model')
+    tokenizer=ChatGLMTokenizer(vocab_file='./tokenizer/chatglm_tokenizer/tokenizer.model')
     train_ds = SFTDataset(df,tokenizer, max_length=512)
 
 
